@@ -1,0 +1,131 @@
+{
+  "hierarchy": {
+    "level1": {
+      "name": "Founder",
+      "role": "Project Owner & Final Approver",
+      "description": "Provides initial prompts, goals, and final approval"
+    },
+    "level2": {
+      "coFounderA": {
+        "name": "Project Manager & Strategist",
+        "role": "Planning & Task Distribution",
+        "responsibilities": [
+          "Break down founder prompts into task checklists",
+          "Assign tasks to appropriate worker agents",
+          "Track overall project progress",
+          "Signal next task upon completion"
+        ]
+      },
+      "coFounderB": {
+        "name": "Quality Assurance & Reviewer",
+        "role": "Code Review & Quality Control",
+        "responsibilities": [
+          "Review worker outputs for errors",
+          "Check code quality and best practices",
+          "Send feedback for fixes if needed",
+          "Mark tasks as complete or request revisions"
+        ]
+      }
+    },
+    "level3": {
+      "workers": {
+        "frontendEngineer": {
+          "name": "Frontend & UI Engineer",
+          "specialty": "HTML/CSS/Glassmorphism",
+          "skills": ["HTML5", "CSS3", "Responsive Design", "UI/UX", "Glassmorphism"],
+          "outputs": ["index.html", "style.css"]
+        },
+        "threejsEngineer": {
+          "name": "Three.js & Game Logic Engineer",
+          "specialty": "3D Graphics & Animations",
+          "skills": ["Three.js", "WebGL", "3D Rendering", "Canvas API", "Animations"],
+          "outputs": ["3D widgets", "canvas elements", "animation scripts"]
+        },
+        "seoMarketer": {
+          "name": "Marketing & SEO Analyst",
+          "specialty": "SEO & Meta Tags",
+          "skills": ["SEO", "JSON-LD", "OpenGraph", "Meta Tags", "Analytics"],
+          "outputs": ["meta tags", "schema markup", "SEO optimization"]
+        },
+        "backendAdmin": {
+          "name": "Backend & Admin Engineer",
+          "specialty": "Admin Panel & Data Management",
+          "skills": ["JavaScript", "localStorage", "Admin Systems", "Security"],
+          "outputs": ["app.js", "admin features", "data persistence"]
+        }
+      }
+    }
+  },
+  "workflow": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Input",
+        "description": "Founder inputs a single goal",
+        "actor": "level1"
+      },
+      {
+        "step": 2,
+        "name": "Planning",
+        "description": "Co-Founder A creates plan and assigns tasks",
+        "actor": "level2.coFounderA"
+      },
+      {
+        "step": 3,
+        "name": "Execution",
+        "description": "Designated worker executes the task",
+        "actor": "level3.workers"
+      },
+      {
+        "step": 4,
+        "name": "Review",
+        "description": "Co-Founder B reviews work and provides feedback",
+        "actor": "level2.coFounderB"
+      },
+      {
+        "step": 5,
+        "name": "Iteration",
+        "description": "Loop back to execution if fixes needed, or mark complete",
+        "actor": "level3.workers"
+      },
+      {
+        "step": 6,
+        "name": "Delivery",
+        "description": "Co-Founder A presents final project to Founder",
+        "actor": "level2.coFounderA"
+      }
+    ]
+  },
+  "currentTask": {
+    "id": "task_001",
+    "description": "Add 3D XP Orb, SEO tags, and admin toggle for visual effects",
+    "status": "in_progress",
+    "assignedTo": ["frontendEngineer", "threejsEngineer", "seoMarketer", "backendAdmin"],
+    "subtasks": [
+      {
+        "id": "1.1",
+        "task": "Create 3D XP Orb with Three.js",
+        "assignedTo": "threejsEngineer",
+        "status": "pending"
+      },
+      {
+        "id": "1.2",
+        "task": "Add SEO meta tags and JSON-LD schema",
+        "assignedTo": "seoMarketer",
+        "status": "pending"
+      },
+      {
+        "id": "1.3",
+        "task": "Update HTML/CSS layout for 3D widget",
+        "assignedTo": "frontendEngineer",
+        "status": "pending"
+      },
+      {
+        "id": "1.4",
+        "task": "Add admin toggle for 3D effects",
+        "assignedTo": "backendAdmin",
+        "status": "pending"
+      }
+    ]
+  }
+}

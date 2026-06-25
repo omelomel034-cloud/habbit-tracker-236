@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Study & Skill Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js Library (Worker A: Three.js/Core Logic) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- SEO Meta Tags (Worker C: Marketing & SEO) -->
+    <meta name="description" content="Daily Study & Skill Tracker - Premium Pomodoro timer, progress tracking, streak counter, and skill dashboard. Build better learning habits with our glassmorphic productivity dashboard.">
+    <meta name="keywords" content="study tracker, pomodoro timer, skill dashboard, productivity, learning tracker, streak counter, study habits, time management">
+    <meta name="author" content="Study Tracker">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://studytracker.app/">
+    
+    <!-- OpenGraph Meta Tags -->
+    <meta property="og:title" content="Daily Study & Skill Tracker - Premium Learning Dashboard">
+    <meta property="og:description" content="Track your daily learning progress with Pomodoro timer, streak counter, and skill metrics. Build better habits with our beautiful glassmorphic dashboard.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://studytracker.app/">
+    <meta property="og:image" content="https://studytracker.app/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Daily Study Tracker">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Daily Study & Skill Tracker - Premium Learning Dashboard">
+    <meta name="twitter:description" content="Track your daily learning progress with Pomodoro timer, streak counter, and skill metrics.">
+    <meta name="twitter:image" content="https://studytracker.app/twitter-card.png">
+    
+    <!-- JSON-LD WebApplication Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Daily Study & Skill Tracker",
+      "description": "Premium productivity dashboard with Pomodoro timer, progress tracking, streak counter, and skill management for students and lifelong learners.",
+      "url": "https://studytracker.app/",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Pomodoro Focus Timer",
+        "Study Streak Counter",
+        "Skill Progress Tracking",
+        "XP Achievement System",
+        "Local Storage Persistence",
+        "Admin Control Panel",
+        "Advertisement Management",
+        "Search & Filter Logs"
+      ],
+      "screenshot": "https://studytracker.app/screenshot.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Study Tracker"
+      },
+      "datePublished": "2024-01-01",
+      "dateModified": "2025-06-21"
+    }
+    </script>
+</head>
+<body>
+    <div class="background-animation">
+        <!-- Mouse-follow glow -->
+        <div class="bg-mouse-glow" id="bgMouseGlow"></div>
+        
+        <!-- Back Layer - Slowest -->
+        <div class="bg-blob layer-back"></div>
+        <div class="bg-blob layer-back"></div>
+        <div class="bg-blob layer-back"></div>
+        
+        <!-- Middle Layer - Medium -->
+        <div class="bg-blob layer-middle"></div>
+        <div class="bg-blob layer-middle"></div>
+        <div class="bg-blob layer-middle"></div>
+        
+        <!-- Front Layer - Slightly faster -->
+        <div class="bg-blob layer-front"></div>
+        <div class="bg-blob layer-front"></div>
+        <div class="bg-blob layer-front"></div>
+    </div>
+    
+    <!-- Notice Board Marquee (Admin Controlled) -->
+    <div class="notice-board" id="noticeBoard" style="display: none;">
+        <div class="notice-marquee">
+            <span class="notice-text" id="noticeText"></span>
+        </div>
+    </div>
+    
+    <!-- Branding Badge (Worker B: Frontend UI/UX) -->
+    <div class="branding-badge">
+        <span>Powered By Chulubulu Academy</span>
+    </div>
+    
+    <div class="container">
+        <!-- Welcome Header -->
+        <header class="welcome-header glass-card">
+            <div class="header-content">
+                <h1 class="greeting">Welcome Back, Student! 👋</h1>
+                <p class="date-display" id="currentDate"></p>
+                <p class="subtitle">Track your daily learning progress and build better habits</p>
+            </div>
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalHours">0</span>
+                    <span class="stat-label">Total Hours</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalSessions">0</span>
+                    <span class="stat-label">Sessions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="currentStreak">0</span>
+                    <span class="stat-label">Day Streak 🔥</span>
+                </div>
+                <div class="stat-item xp-stat">
+                    <span class="stat-value" id="totalXP">0</span>
+                    <span class="stat-label">Skill Points (XP)</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Pomodoro Timer Widget -->
+        <section class="pomodoro-section glass-card">
+            <h2 class="section-title">🍅 Pomodoro Focus Timer</h2>
+            <div class="pomodoro-container">
+                <div class="timer-display">
+                    <div class="time-circle">
+                        <svg class="progress-ring" width="200" height="200">
+                            <circle class="progress-ring-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="progress-ring-fill" cx="100" cy="100" r="90" id="timerProgress"></circle>
+                        </svg>
+                        <div class="time-text">
+                            <span class="time-minutes" id="timerMinutes">25</span>
+                            <span class="time-separator">:</span>
+                            <span class="time-seconds" id="timerSeconds">00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="timer-controls">
+                    <button id="startTimer" class="btn-timer btn-start">
+                        <span>▶ Start</span>
+                    </button>
+                    <button id="pauseTimer" class="btn-timer btn-pause" disabled>
+                        <span>⏸ Pause</span>
+                    </button>
+                    <button id="resetTimer" class="btn-timer btn-reset-timer">
+                        <span>↺ Reset</span>
+                    </button>
+                </div>
+                <div class="timer-status" id="timerStatus">
+                    <span>Ready to focus? Start your 25-minute session!</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Student Habit Metrics Graph with Nested Habit Tracker (Worker A & B) -->
+        <section class="habits-metrics-section glass-card">
+            <h2 class="section-title">📊 Student Habit Metrics</h2>
+            <div class="habits-graph-container">
+                <svg class="habits-graph" viewBox="0 0 700 300" preserveAspectRatio="xMidYMid meet">
+                    <!-- Grid Lines -->
+                    <g class="grid-lines">
+                        <line x1="50" y1="250" x2="680" y2="250" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="50" y1="200" x2="680" y2="200" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <line x1="50" y1="150" x2="680" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <line x1="50" y1="100" x2="680" y2="100" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <line x1="50" y1="50" x2="680" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                    </g>
+                    
+                    <!-- Y-Axis Labels -->
+                    <g class="y-axis-labels">
+                        <text x="40" y="255" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="end">0%</text>
+                        <text x="40" y="205" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="end">25%</text>
+                        <text x="40" y="155" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="end">50%</text>
+                        <text x="40" y="105" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="end">75%</text>
+                        <text x="40" y="55" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="end">100%</text>
+                    </g>
+                    
+                    <!-- X-Axis Labels (Days) -->
+                    <g class="x-axis-labels">
+                        <text x="90" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Mon</text>
+                        <text x="180" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Tue</text>
+                        <text x="270" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Wed</text>
+                        <text x="360" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Thu</text>
+                        <text x="450" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Fri</text>
+                        <text x="540" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Sat</text>
+                        <text x="630" y="275" fill="rgba(255,255,255,0.5)" font-size="11" text-anchor="middle">Sun</text>
+                    </g>
+                    
+                    <!-- Dynamic Data Line (will be updated by JavaScript) -->
+                    <polyline id="habitsDataLine" 
+                              points="90,250 180,250 270,250 360,250 450,250 540,250 630,250" 
+                              fill="none" 
+                              stroke="url(#graphGradient)" 
+                              stroke-width="3" 
+                              stroke-linecap="round" 
+                              stroke-linejoin="round"/>
+                    
+                    <!-- Gradient Definition -->
+                    <defs>
+                        <linearGradient id="graphGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#ff00ff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Data Points -->
+                    <g id="habitsDataPoints">
+                        <circle cx="90" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                        <circle cx="180" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                        <circle cx="270" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                        <circle cx="360" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                        <circle cx="450" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                        <circle cx="540" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                        <circle cx="630" cy="250" r="5" fill="#00d4ff" stroke="white" stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Area Under Curve -->
+                    <polygon id="habitsDataArea" 
+                             points="90,250 180,250 270,250 360,250 450,250 540,250 630,250 630,250 90,250" 
+                             fill="url(#areaGradient)" 
+                             opacity="0.3"/>
+                    
+                    <defs>
+                        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.5" />
+                            <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                
+                <!-- Legend -->
+                <div class="graph-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot"></span>
+                        <span>Weekly Habit Completion</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Habit Tracker - Nested Inside Metrics Card (Worker B: 2-Column Grid) -->
+            <div class="habits-tracker-inner">
+                <h3 class="inner-section-title">✅ Daily Habit Tracker</h3>
+                <div class="habits-grid">
+                    <!-- Sleep Tracking -->
+                    <div class="habit-item glass-card" data-habit="sleep">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-sleep" class="habit-checkbox">
+                            <label for="habit-sleep" class="habit-label">
+                                <span class="habit-icon">😴</span>
+                                <span class="habit-name">Sleep Tracking</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <input type="number" id="sleep-hours" class="habit-input" placeholder="Hours" min="0" max="24" step="0.5">
+                            <span class="habit-unit">hrs</span>
+                        </div>
+                    </div>
+
+                    <!-- Water Intake -->
+                    <div class="habit-item glass-card" data-habit="water">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-water" class="habit-checkbox">
+                            <label for="habit-water" class="habit-label">
+                                <span class="habit-icon">💧</span>
+                                <span class="habit-name">Water Intake</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <input type="number" id="water-glasses" class="habit-input" placeholder="Glasses" min="0" max="20" step="1">
+                            <span class="habit-unit">glasses</span>
+                        </div>
+                    </div>
+
+                    <!-- Reading Time -->
+                    <div class="habit-item glass-card" data-habit="reading">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-reading" class="habit-checkbox">
+                            <label for="habit-reading" class="habit-label">
+                                <span class="habit-icon">📖</span>
+                                <span class="habit-name">Reading Time</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <input type="number" id="reading-minutes" class="habit-input" placeholder="Minutes" min="0" max="480" step="5">
+                            <span class="habit-unit">min</span>
+                        </div>
+                    </div>
+
+                    <!-- Exercise -->
+                    <div class="habit-item glass-card" data-habit="exercise">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-exercise" class="habit-checkbox">
+                            <label for="habit-exercise" class="habit-label">
+                                <span class="habit-icon">🏃</span>
+                                <span class="habit-name">Exercise</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <input type="number" id="exercise-minutes" class="habit-input" placeholder="Minutes" min="0" max="300" step="5">
+                            <span class="habit-unit">min</span>
+                        </div>
+                    </div>
+
+                    <!-- Core Work / Study -->
+                    <div class="habit-item glass-card" data-habit="corework">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-corework" class="habit-checkbox">
+                            <label for="habit-corework" class="habit-label">
+                                <span class="habit-icon">💼</span>
+                                <span class="habit-name" id="coreWorkLabel">Core Work / Study</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <input type="number" id="corework-minutes" class="habit-input" placeholder="Minutes" min="0" max="480" step="5">
+                            <span class="habit-unit">min</span>
+                        </div>
+                    </div>
+
+                    <!-- Food / Nutrition -->
+                    <div class="habit-item glass-card" data-habit="food">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-food" class="habit-checkbox">
+                            <label for="habit-food" class="habit-label">
+                                <span class="habit-icon">🥗</span>
+                                <span class="habit-name">Food / Nutrition</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <select id="food-quality" class="habit-select">
+                                <option value="">Quality</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="average">Average</option>
+                                <option value="poor">Poor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Pray / Mindfulness -->
+                    <div class="habit-item glass-card" data-habit="pray">
+                        <div class="habit-checkbox-wrapper">
+                            <input type="checkbox" id="habit-pray" class="habit-checkbox">
+                            <label for="habit-pray" class="habit-label">
+                                <span class="habit-icon">🧘</span>
+                                <span class="habit-name">Pray / Mindfulness</span>
+                            </label>
+                        </div>
+                        <div class="habit-details">
+                            <input type="number" id="pray-minutes" class="habit-input" placeholder="Minutes" min="0" max="120" step="5">
+                            <span class="habit-unit">min</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Habit Progress Summary -->
+                <div class="habits-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Today's Progress</span>
+                        <span class="summary-value" id="habitsCompleted">0/7</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Completion Rate</span>
+                        <span class="summary-value" id="habitsRate">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skill Selection Cards -->
+        <section class="skills-section">
+            <h2 class="section-title">Your Learning Paths</h2>
+            <div class="skills-grid">
+                <!-- Coding Card -->
+                <div class="skill-card glass-card coding-card" data-category="coding">
+                    <div class="card-icon">💻</div>
+                    <h3>Coding</h3>
+                    <p class="card-subtitle">HTML, JavaScript, Python, Three.js</p>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill coding-fill" id="codingProgress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="codingHours">0h / 10h</span>
+                    </div>
+                    <div class="quick-topics">
+                        <span class="topic-tag">HTML</span>
+                        <span class="topic-tag">JS</span>
+                        <span class="topic-tag">Python</span>
+                        <span class="topic-tag">Three.js</span>
+                    </div>
+                </div>
+
+                <!-- Marketing Card -->
+                <div class="skill-card glass-card marketing-card" data-category="marketing">
+                    <div class="card-icon">📈</div>
+                    <h3>Marketing</h3>
+                    <p class="card-subtitle">FBA Wholesale, SEO, Social Media Ads</p>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill marketing-fill" id="marketingProgress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="marketingHours">0h / 8h</span>
+                    </div>
+                    <div class="quick-topics">
+                        <span class="topic-tag">FBA</span>
+                        <span class="topic-tag">SEO</span>
+                        <span class="topic-tag">Ads</span>
+                    </div>
+                </div>
+
+                <!-- School Subjects Card -->
+                <div class="skill-card glass-card school-card" data-category="school">
+                    <div class="card-icon">📚</div>
+                    <h3>School Subjects</h3>
+                    <p class="card-subtitle">General lessons, chapters, and studies</p>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill school-fill" id="schoolProgress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text" id="schoolHours">0h / 12h</span>
+                    </div>
+                    <div class="quick-topics">
+                        <span class="topic-tag">Math</span>
+                        <span class="topic-tag">Science</span>
+                        <span class="topic-tag">History</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Add Log Form -->
+        <section class="log-section glass-card">
+            <h2 class="section-title">📝 Quick Add Study Log</h2>
+            <form id="studyLogForm" class="log-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="coding">💻 Coding</option>
+                            <option value="marketing">📈 Marketing</option>
+                            <option value="school">📚 School Subjects</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="topic">Topic / What You Learned</label>
+                        <input type="text" id="topic" placeholder="e.g., JavaScript Loops, SEO Meta Tags" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duration">Time Spent</label>
+                        <div class="duration-input">
+                            <input type="number" id="duration" placeholder="Minutes" min="1" max="480" required>
+                            <select id="durationUnit">
+                                <option value="minutes">Minutes</option>
+                                <option value="hours">Hours</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes (Optional)</label>
+                        <input type="text" id="notes" placeholder="Any additional notes...">
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <span>+ Add Study Log</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Recent Activity Log - NOW DISTRACTION FREE -->
+        <section class="history-section glass-card">
+            <div class="history-header">
+                <h2 class="section-title">📊 Recent Activity Log</h2>
+                <button id="resetBtn" class="btn-reset">
+                    <span>🗑️ Reset Data</span>
+                </button>
+            </div>
+            
+            <!-- Search and Filter Controls -->
+            <div class="history-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search logs by keyword...">
+                </div>
+                <div class="filter-box">
+                    <select id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="coding">💻 Coding</option>
+                        <option value="marketing">📈 Marketing</option>
+                        <option value="school">📚 School Subjects</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Category</th>
+                            <th>Topic</th>
+                            <th>Duration</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Dynamic rows will be inserted here -->
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">📭</div>
+                    <p>No study logs yet. Start tracking your progress!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Focus Targets Configuration (Worker A & B: Per-Category Targets) -->
+        <section class="focus-targets-section glass-card">
+            <h2 class="section-title">🎯 Daily Focus Targets</h2>
+            <p class="section-subtitle">Set individual daily targets for each learning category (Minimum: 1 hour each)</p>
+            <div class="focus-targets-grid">
+                <!-- Coding Target -->
+                <div class="target-card glass-card coding-target" data-category="coding">
+                    <div class="target-header">
+                        <span class="target-icon">💻</span>
+                        <h3>Coding Time</h3>
+                    </div>
+                    <div class="target-input-group">
+                        <input type="number" id="codingTargetHours" class="target-input" placeholder="Hours" min="1" max="24" step="0.5" value="2">
+                        <span class="input-separator">:</span>
+                        <input type="number" id="codingTargetMinutes" class="target-input" placeholder="Min" min="0" max="59" step="5" value="0">
+                    </div>
+                    <div class="target-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="codingTargetEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">Active</span>
+                    </div>
+                </div>
+
+                <!-- Marketing Target -->
+                <div class="target-card glass-card marketing-target" data-category="marketing">
+                    <div class="target-header">
+                        <span class="target-icon">📈</span>
+                        <h3>Marketing Learning</h3>
+                    </div>
+                    <div class="target-input-group">
+                        <input type="number" id="marketingTargetHours" class="target-input" placeholder="Hours" min="1" max="24" step="0.5" value="1">
+                        <span class="input-separator">:</span>
+                        <input type="number" id="marketingTargetMinutes" class="target-input" placeholder="Min" min="0" max="59" step="5" value="0">
+                    </div>
+                    <div class="target-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="marketingTargetEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">Active</span>
+                    </div>
+                </div>
+
+                <!-- School/Study Target -->
+                <div class="target-card glass-card school-target" data-category="school">
+                    <div class="target-header">
+                        <span class="target-icon">📚</span>
+                        <h3>School Core Study</h3>
+                    </div>
+                    <div class="target-input-group">
+                        <input type="number" id="schoolTargetHours" class="target-input" placeholder="Hours" min="1" max="24" step="0.5" value="2">
+                        <span class="input-separator">:</span>
+                        <input type="number" id="schoolTargetMinutes" class="target-input" placeholder="Min" min="0" max="59" step="5" value="0">
+                    </div>
+                    <div class="target-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="schoolTargetEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">Active</span>
+                    </div>
+                </div>
+            </div>
+            <button id="saveFocusTargetsBtn" class="btn-config-save">
+                <span>💾 Save Focus Targets</span>
+            </button>
+        </section>
+
+        <!-- Dynamic Target & Time Configuration Panel (Worker A & D) -->
+        <section class="config-panel-section glass-card">
+            <h2 class="section-title">⚙️ General Configuration</h2>
+            <div class="config-content">
+                <div class="config-group">
+                    <label for="customSkillName">Custom Focus Track Name</label>
+                    <input type="text" id="customSkillName" placeholder="e.g., Math, Graphics, Writing" maxlength="30">
+                    <small>Replace "Coding" with your custom skill</small>
+                </div>
+                
+                <div class="config-group">
+                    <label for="dailyTargetHours">Overall Daily Study Target</label>
+                    <div class="target-input-group">
+                        <input type="number" id="dailyTargetHours" placeholder="Hours" min="0" max="24" step="0.5" value="4">
+                        <span class="input-separator">:</span>
+                        <input type="number" id="dailyTargetMinutes" placeholder="Minutes" min="0" max="59" step="5" value="0">
+                    </div>
+                    <small>Set your overall daily focus duration goal</small>
+                </div>
+                
+                <button id="saveConfigBtn" class="btn-config-save">
+                    <span>💾 Save Configuration</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer with Integrated Ad -->
+        <footer class="footer">
+            <p>Daily Study & Skill Tracker © 2024 | Built with ❤️ for students</p>
+            <button id="adminLoginBtn" class="admin-login-btn" title="Admin Access">
+                <span>🔐 Admin</span>
+            </button>
+            
+            <!-- Compact Footer Ad (Bottom Banner - Non-intrusive) -->
+            <div class="footer-ad-wrapper">
+                <div class="ad-placeholder footer-ad glass-card" id="footerAd">
+                    <div class="ad-content" id="footerAdContent">
+                        <span class="ad-label">Advertisement</span>
+                        <p>Your ad will appear here</p>
+                        <small>Paste your Google AdSense or Adsterra script</small>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Three.js 3D Canvas (Worker A: Three.js/Core Logic) -->
+    <canvas id="threejs-canvas" class="threejs-canvas"></canvas>
+    
+    <!-- XP Floating Animation Container -->
+    <div class="xp-floating-container" id="xpFloatingContainer"></div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Admin Login Modal -->
+    <div class="modal-overlay" id="adminLoginModal">
+        <div class="modal-content glass-card admin-modal">
+            <h3>🔐 Admin Authentication</h3>
+            <p>Enter the admin password to access the control panel.</p>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required autocomplete="off">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-confirm">Login</button>
+                    <button type="button" class="btn-cancel" id="cancelAdminLogin">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div class="admin-panel" id="adminPanel" style="display: none;">
+        <div class="admin-header glass-card">
+            <h2>⚙️ Admin Control Panel</h2>
+            <button id="logoutBtn" class="btn-logout">
+                <span>🚪 Logout</span>
+            </button>
+        </div>
+
+        <div class="admin-content">
+            <!-- Advertisement Controller -->
+            <div class="admin-section glass-card">
+                <h3>📢 Advertisement Controller</h3>
+                <p class="admin-description">Manage Google AdSense or Adsterra ad scripts for the dashboard.</p>
+                
+                <div class="form-group">
+                    <label for="sidebarAdScript">Sidebar Ad Script (300x250 - HTML/JavaScript)</label>
+                    <textarea id="sidebarAdScript" rows="6" placeholder="Paste your ad script here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="bannerAdScript">Footer Banner Ad Script (468x60 - HTML/JavaScript)</label>
+                    <textarea id="bannerAdScript" rows="6" placeholder="Paste your ad script here..."></textarea>
+                </div>
+
+                <button id="saveAdsBtn" class="btn-admin-save">
+                    <span>💾 Save Advertisements</span>
+                </button>
+            </div>
+
+            <!-- Notice Board Controller -->
+            <div class="admin-section glass-card">
+                <h3>📢 Global Notice Board</h3>
+                <p class="admin-description">Create announcements or motivational tips for all students.</p>
+                
+                <div class="form-group">
+                    <label for="noticeText">Notice Message</label>
+                    <input type="text" id="noticeText" placeholder="e.g., Coding Bootcamp Starts Next Week! 🚀" maxlength="200">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="noticeEnabled"> Enable Notice Board
+                    </label>
+                </div>
+
+                <button id="saveNoticeBtn" class="btn-admin-save">
+                    <span>💾 Save Notice</span>
+                </button>
+            </div>
+
+            <!-- System Controls -->
+            <div class="admin-section glass-card">
+                <h3>🛠️ System Controls</h3>
+                <p class="admin-description">Manage global settings and view system statistics.</p>
+                
+                <div class="admin-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Storage Used</span>
+                        <span class="stat-value" id="storageUsed">0 KB</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Total Users</span>
+                        <span class="stat-value">1 (Local)</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">System Status</span>
+                        <span class="stat-value" style="color: var(--emerald);">● Online</span>
+                    </div>
+                </div>
+
+                <button id="clearAllDataBtn" class="btn-admin-danger">
+                    <span>🗑️ Clear All User Data</span>
+                </button>
+                <button id="clearSettingsBtn" class="btn-admin-warning">
+                    <span>🔄 Reset Admin Settings Only</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal-content glass-card">
+            <h3>⚠️ Confirm Reset</h3>
+            <p>Are you sure you want to clear all your study data? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="confirmReset" class="btn-confirm">Yes, Reset All</button>
+                <button id="cancelReset" class="btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>
